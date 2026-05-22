@@ -6,8 +6,6 @@ import calculadora_pb2 as calculadora__pb2
 
 
 class CalculadoraStub(object):
-    """── Serviço ───────────────────────────────────────────────────────────────────"""
-
     def __init__(self, channel):
         self.Somar = channel.unary_unary(
                 '/calculadora.Calculadora/Somar',
@@ -57,8 +55,6 @@ class CalculadoraStub(object):
 
 
 class CalculadoraServicer(object):
-    """── Serviço ───────────────────────────────────────────────────────────────────"""
-
     def Somar(self, request, context):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -105,54 +101,63 @@ class CalculadoraServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
+class _CalculadoraHandler(grpc.GenericRpcHandler):
+    """
+    GenericRpcHandler compatível com grpcio 1.80.
+    Substitui grpc.method_service_handler que não existe nessa versão.
+    """
+    def __init__(self, servicer):
+        self._handlers = {
+            '/calculadora.Calculadora/Somar': grpc.unary_unary_rpc_method_handler(
+                servicer.Somar,
+                request_deserializer=calculadora__pb2.DoisNumeros.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/Subtrair': grpc.unary_unary_rpc_method_handler(
+                servicer.Subtrair,
+                request_deserializer=calculadora__pb2.DoisNumeros.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/Multiplicar': grpc.unary_unary_rpc_method_handler(
+                servicer.Multiplicar,
+                request_deserializer=calculadora__pb2.DoisNumeros.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/Dividir': grpc.unary_unary_rpc_method_handler(
+                servicer.Dividir,
+                request_deserializer=calculadora__pb2.DoisNumeros.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/CalcularPotencia': grpc.unary_unary_rpc_method_handler(
+                servicer.CalcularPotencia,
+                request_deserializer=calculadora__pb2.DoisNumeros.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/CalcularRaizQuadrada': grpc.unary_unary_rpc_method_handler(
+                servicer.CalcularRaizQuadrada,
+                request_deserializer=calculadora__pb2.NumeroUnico.FromString,
+                response_serializer=calculadora__pb2.Resultado.SerializeToString,
+            ),
+            '/calculadora.Calculadora/SomarStream': grpc.stream_unary_rpc_method_handler(
+                servicer.SomarStream,
+                request_deserializer=calculadora__pb2.NumeroStream.FromString,
+                response_serializer=calculadora__pb2.SomaTotal.SerializeToString,
+            ),
+            '/calculadora.Calculadora/GerarTabuada': grpc.unary_stream_rpc_method_handler(
+                servicer.GerarTabuada,
+                request_deserializer=calculadora__pb2.EntradaTabuada.FromString,
+                response_serializer=calculadora__pb2.LinhaTabuada.SerializeToString,
+            ),
+            '/calculadora.Calculadora/CalcularMediaMovel': grpc.stream_stream_rpc_method_handler(
+                servicer.CalcularMediaMovel,
+                request_deserializer=calculadora__pb2.NumeroStream.FromString,
+                response_serializer=calculadora__pb2.MediaParcial.SerializeToString,
+            ),
+        }
+
+    def service(self, handler_call_details):
+        return self._handlers.get(handler_call_details.method)
+
+
 def add_CalculadoraServicer_to_server(servicer, server):
-    rpc_method_handlers = {
-            'Somar': grpc.unary_unary_rpc_method_handler(
-                    servicer.Somar,
-                    request_deserializer=calculadora__pb2.DoisNumeros.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'Subtrair': grpc.unary_unary_rpc_method_handler(
-                    servicer.Subtrair,
-                    request_deserializer=calculadora__pb2.DoisNumeros.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'Multiplicar': grpc.unary_unary_rpc_method_handler(
-                    servicer.Multiplicar,
-                    request_deserializer=calculadora__pb2.DoisNumeros.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'Dividir': grpc.unary_unary_rpc_method_handler(
-                    servicer.Dividir,
-                    request_deserializer=calculadora__pb2.DoisNumeros.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'CalcularPotencia': grpc.unary_unary_rpc_method_handler(
-                    servicer.CalcularPotencia,
-                    request_deserializer=calculadora__pb2.DoisNumeros.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'CalcularRaizQuadrada': grpc.unary_unary_rpc_method_handler(
-                    servicer.CalcularRaizQuadrada,
-                    request_deserializer=calculadora__pb2.NumeroUnico.FromString,
-                    response_serializer=calculadora__pb2.Resultado.SerializeToString,
-            ),
-            'SomarStream': grpc.stream_unary_rpc_method_handler(
-                    servicer.SomarStream,
-                    request_deserializer=calculadora__pb2.NumeroStream.FromString,
-                    response_serializer=calculadora__pb2.SomaTotal.SerializeToString,
-            ),
-            'GerarTabuada': grpc.unary_stream_rpc_method_handler(
-                    servicer.GerarTabuada,
-                    request_deserializer=calculadora__pb2.EntradaTabuada.FromString,
-                    response_serializer=calculadora__pb2.LinhaTabuada.SerializeToString,
-            ),
-            'CalcularMediaMovel': grpc.stream_stream_rpc_method_handler(
-                    servicer.CalcularMediaMovel,
-                    request_deserializer=calculadora__pb2.NumeroStream.FromString,
-                    response_serializer=calculadora__pb2.MediaParcial.SerializeToString,
-            ),
-    }
-    generic_handler = grpc.method_service_handler(
-            'calculadora.Calculadora', rpc_method_handlers)
-    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_generic_rpc_handlers((_CalculadoraHandler(servicer),))
